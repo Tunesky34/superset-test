@@ -5,7 +5,7 @@ import os
 # -----------------------------
 SECRET_KEY = os.environ.get("SUPERSET_SECRET_KEY", "changeme")
 
-TALISMAN_ENABLED = True
+TALISMAN_ENABLED = os.environ.get("TALISMAN_ENABLED", "false").lower() == "true"
 TALISMAN_CONFIG = {
     "content_security_policy": {
         "default-src": ["'self'"],

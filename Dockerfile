@@ -1,9 +1,3 @@
-# Build with: docker build --build-arg SUPERSET_VERSION=4.1.1 -t superset-poc .
-# To test the upgrade later, just rebuild with a newer SUPERSET_VERSION
-# (or edit the default below). Confirm the actual current release tag on
-# Docker Hub / the Superset GitHub releases page rather than assuming a
-# literal "latest" tag always points where you expect.
-
 ARG SUPERSET_VERSION=4.1.1
 FROM apache/superset:${SUPERSET_VERSION}
 
@@ -15,10 +9,18 @@ RUN apt-get update && apt-get install -y \
         build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir \
-        psycopg2-binary \
-        redis \
-        clickhouse-connect \
-        mysqlclient
+RUN if [ -x /app/.venv/bin/python ]; then \
+        uv pip install --python /app/.venv/bin/python --no-cache \
+            psycopg2-binary \
+            redis \
+            'clickhouse-connect==0.13.0' \
+            mysqlclient; \
+    else \
+        pip install --no-cache-dir \
+            psycopg2-binary \
+            redis \
+            'clickhouse-connect==0.13.0' \
+            mysqlclient; \
+    fi
 
 USER superset
